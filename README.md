@@ -1,2 +1,2 @@
 # freeduck
-free duck db GUI
+free duckdb GUI
