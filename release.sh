@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# pyinstaller -D -w -i "icon.ico" main.py
+pyinstaller -D -w -i "icon.ico" --name "FreeDuck" main.py
 
-pyinstaller --onefile --windowed --name "FreeDuck" --icon "icon.ico" main.py
+# copy the project dependencies
+cp *.py dist/FreeDuck/_internal
+cp -r ui dist/FreeDuck/_internal
 
-# --onefile: Bundles everything into a single executable file (e.g., your_script_name.exe on Windows). If omitted, PyInstaller creates a directory containing the executable and its dependencies.
-# --name "YourAppName": Specifies the name for the output executable and the generated .spec file.
-# --windowed or --noconsole: Creates a GUI application without a console window. This is useful for applications with a graphical user interface.
-# --add-data "source_path;destination_path": Includes additional data files (e.g., images, configuration files) in the bundle. The destination_path is relative to the root of the bundled application.
-# --icon "icon.ico": Specifies a custom icon for the executable.
+# make sure the exe is working
+# then use innosetup to create an installer
