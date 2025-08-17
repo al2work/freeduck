@@ -1,6 +1,7 @@
 import os
 from PySide6.QtWidgets import (
     QFileDialog,
+    QInputDialog,
     QMessageBox,
     QTableWidget,
     QTableWidgetItem,
@@ -23,6 +24,8 @@ class MainWindow:
     def init_shortcut(self):
         self.action_open = self.ui.actionOpen
         self.action_open.triggered.connect(self.open_file_dialog)
+        self.action_table = self.ui.actionTable
+        self.action_table.triggered.connect(self.open_one_table_input_dialog)
 
     def open_file_dialog(self):
         files, _ = QFileDialog.getOpenFileNames(
@@ -88,3 +91,31 @@ class MainWindow:
                 item = QTableWidgetItem(str(value))
                 self.duckdb_ui_table.setItem(i, j, item)
         self.ui.show()
+
+    def open_one_table_input_dialog(self):
+        table_name, ok = QInputDialog.getText(
+            self.ui, "Input Table Name", "Table Name:"
+        )
+        if ok and table_name:
+            self.show_one_table_contents(table_name)
+        elif ok and not table_name:
+            QMessageBox.warning(self.ui, "empty", "Please input a table name.")
+
+    def show_one_table_contents(self, table_name):
+        if not self.conn:
+            raise ConnectionError("Please connect to the database first.")
+        # get table header and raw
+        table_raw = self.conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+        rows = self.conn.execute(f"SELECT * FROM {table_name}").fetchall()
+        ui_header = [col[1] for col in table_raw]
+        # refresh ui table
+        self.duckdb_ui_table.setColumnCount(len(ui_header))
+        self.duckdb_ui_table.setRowCount(len(rows))
+        self.duckdb_ui_table.setHorizontalHeaderLabels(ui_header)
+        ui_header = self.duckdb_ui_table.horizontalHeader()
+        ui_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        # fill
+        for i, row in enumerate(rows):
+            for j, value in enumerate(row):
+                item = QTableWidgetItem(str(value))
+                self.duckdb_ui_table.setItem(i, j, item)
