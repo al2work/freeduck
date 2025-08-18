@@ -9,5 +9,6 @@ free duckdb GUI
 
 ## TODO
 
-1. select table and jump
+1. remember last db, click to open
 2. custom  SQL query
+3. select table and jump
